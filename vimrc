@@ -41,8 +41,10 @@ set ruler		" show the cursor position all the time
 set showcmd		" display incomplete commands
 set incsearch		" do incremental searching
 
-" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
-let &guioptions = substitute(&guioptions, "t", "", "g")
+:set guioptions-=m	" no menu bar
+:set guioptions-=T	" no toolbar
+:set guioptions-=t	" no tearoff menus
+:set guioptions-=r	" no right scrollbar
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
