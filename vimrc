@@ -21,6 +21,13 @@ endif
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 
+" Solarized light sounds like a nice colorscheme
+if has("gui")
+    syntax enable
+    set background=light
+    colorscheme solarized
+endif
+
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
