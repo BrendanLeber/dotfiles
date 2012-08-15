@@ -10,5 +10,4 @@ Create symlinks:
 Switch to the `vimfiles` directory, and fetch submodules:
 
     cd vimfiles
-    git submodule init
-    git submodule update
+    git submodule update --init
