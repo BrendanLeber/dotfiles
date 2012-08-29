@@ -1,5 +1,7 @@
+filetype off
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
+filetype plugin indent on
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
@@ -22,11 +24,23 @@ set ruler	        " show the cursor position all the time
 set showcmd         " display incomplete commands
 set incsearch       " do incremental searching
 
-set number
+set relativenumber
 set visualbell
 set tabstop=4 softtabstop=4 shiftwidth=4 expandtab
 syntax on
 
+set ttyfast
+
+" some searching improvements
+nnoremap \ /\v
+vnoremap \ /\v
+set ignorecase
+set smartcase
+set gdefault
+set incsearch
+set showmatch
+set hlsearch
+nnoremap <leader><space> :noh<cr>
 
 " Don't use Ex mode, use Q for formatting
 " map Q gq
