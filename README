@@ -1,13 +1,13 @@
 Installation:
 
-    git clone git://github.com/BrendanLeber/dotvim.git vimfiles
+    git clone git://github.com/BrendanLeber/dotvim.git dotvim
 
 Create symlinks:
 
-    mklink _vimrc vimfiles/vimrc
-    mklink _gvimrc vimfiles/gvimrc
+    mklink _vimrc dotvim/vimrc
+    mklink _gvimrc dotvim/gvimrc
 
-Switch to the `vimfiles` directory, and fetch submodules:
+Switch to the `dotvim` directory, and fetch submodules:
 
-    cd vimfiles
+    cd dotvim
     git submodule update --init
