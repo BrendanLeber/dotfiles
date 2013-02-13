@@ -20,7 +20,7 @@ set noswapfile
 set backspace=indent,eol,start
 
 set history=50      " keep 50 lines of command line history
-set ruler	        " show the cursor position all the time
+set ruler           " show the cursor position all the time
 set showcmd         " display incomplete commands
 set incsearch       " do incremental searching
 
@@ -84,7 +84,7 @@ if has("autocmd")
 "
 else
 
-  set autoindent		" always set autoindenting on
+  set autoindent        " always set autoindenting on
 
 endif " has("autocmd")
 
@@ -93,5 +93,23 @@ endif " has("autocmd")
 " Only define it when not defined already.
 " if !exists(":DiffOrig")
 "   command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-" 		  \ | wincmd p | diffthis
+"         \ | wincmd p | diffthis
 " endif
+
+function! Preserve(command)
+    " save last search and cursor position
+    let _s=@/
+    let l = line(".")
+    let c = col(".")
+    " do the business
+    execute a:command
+    " restore previous search history and cursor position
+    let @/=_s
+    call cursor(l, c)
+endfunction
+
+" remove trailing whitespace
+nmap _$ :call Preserve("%s/\\s\\+$//e")<CR>
+
+" reindent entire file
+nmap _= :call Preserve("normal gg=G")<CR>
