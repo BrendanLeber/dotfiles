@@ -5,11 +5,6 @@ if !exists("g:loaded_pathogen")
 endif
 filetype plugin indent on
 
-" When started as "evim", evim.vim will already have done these settings.
-if v:progname =~? "evim"
-    finish
-endif
-
 " Use Vim settings, rather than Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
 set nocompatible
@@ -29,7 +24,12 @@ set incsearch       " do incremental searching
 set relativenumber
 set visualbell
 set tabstop=4 softtabstop=4 shiftwidth=4 expandtab
-syntax on
+
+syntax enable
+set t_Co=256
+set t_ut=
+"set background=dark
+colorscheme inkpot
 
 set ttyfast
 
@@ -39,10 +39,8 @@ vnoremap \ /\v
 set ignorecase
 set smartcase
 set gdefault
-set incsearch
 set showmatch
 set hlsearch
-nnoremap <leader><space> :noh<cr>
 
 " Don't use Ex mode, use Q for formatting
 " map Q gq
@@ -51,14 +49,8 @@ nnoremap <leader><space> :noh<cr>
 " so that you can undo CTRL-U after inserting a line break.
 " inoremap <C-U> <C-G>u<C-U>
 
-" In many terminal emulators the mouse works just fine, thus enable it.
-" if has('mouse')
-"   set mouse=a
-" endif
-
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
-
     " Enable file type detection.
     " Use the default filetype settings, so that mail gets 'tw' set to 72,
     " 'cindent' is on in C files, etc.
@@ -70,20 +62,7 @@ if has("autocmd")
     " au!
     "
     " " For all text files set 'textwidth' to 78 characters.
-    " autocmd FileType text setlocal textwidth=78
-    "
-    " " When editing a file, always jump to the last known cursor position.
-    " " Don't do it when the position is invalid or when inside an event handler
-    " " (happens when dropping a file on gvim).
-    " " Also don't do it when the mark is in the first line, that is the default
-    " " position when opening a file.
-    " autocmd BufReadPost *
-    "   \ if line("'\"") > 1 && line("'\"") <= line("$") |
-    "   \   exe "normal! g`\"" |
-    "   \ endif
-    "
-    " augroup END
-    "
+    autocmd FileType text setlocal textwidth=78
 else
 
     set autoindent        " always set autoindenting on
@@ -98,15 +77,10 @@ endif " has("autocmd")
 "         \ | wincmd p | diffthis
 " endif
 
-" source the .vimrc and .gvimrc file after saving them
-if has("autocmd")
-    autocmd bufwritepost .vimrc source $MYVIMRC
-    autocmd bufwritepost .gvimrc source $MYGVIMRC
-endif
-
 let mapleader = ","
-nmap <leader>v :tabedit $MYVIMRC<CR>
-nmap <leader>g :tabedit $MYGVIMRC<CR>
+nmap <leader>v :source ~/.vimrc<cr>
+nmap <leader>V :e ~/.vimrc<cr>
+noremap <leader>h :nohl<cr>
 
 function! Preserve(command)
     " save last search and cursor position
@@ -125,3 +99,9 @@ nmap _$ :call Preserve("%s/\\s\\+$//e")<CR>
 
 " reindent entire file
 nmap _= :call Preserve("normal gg=G")<CR>
+
+" read in Isilon specific settings if it exists
+let IVF=expand("~/.isilon.vim")
+if filereadable(IVF)
+    source IVF
+endif
