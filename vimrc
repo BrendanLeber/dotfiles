@@ -13,6 +13,11 @@ set nocompatible
 set nobackup
 set noswapfile
 
+" everything should be UTF-8 when reading or writing to files
+set encoding=utf-8
+set fenc=utf-8
+set termencoding=utf-8
+
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
@@ -82,6 +87,12 @@ nmap <leader>v :source ~/.vimrc<cr>
 nmap <leader>V :e ~/.vimrc<cr>
 noremap <leader>h :nohl<cr>
 
+" switch between windows easier
+map <C-j> <C-W>j
+map <C-k> <C-W>k
+map <C-h> <C-W>h
+map <C-l> <C-W>l
+
 function! Preserve(command)
     " save last search and cursor position
     let _s=@/
@@ -101,7 +112,6 @@ nmap _$ :call Preserve("%s/\\s\\+$//e")<CR>
 nmap _= :call Preserve("normal gg=G")<CR>
 
 " read in Isilon specific settings if it exists
-let IVF=expand("~/.isilon.vim")
-if filereadable(IVF)
-    source IVF
+if filereadable("~/.isilon.vim")
+    source ~/.isilon.vim
 endif
