@@ -82,10 +82,13 @@ endif " has("autocmd")
 "         \ | wincmd p | diffthis
 " endif
 
-let mapleader = ","
+let mapleader=","
 nmap <leader>v :source ~/.vimrc<cr>
 nmap <leader>V :e ~/.vimrc<cr>
 noremap <leader>h :nohl<cr>
+
+noremap <leader>ls :!ls $(dirname %)<cr>
+noremap <leader>la :!ls -al $(dirname %)<cr>
 
 " switch between windows easier
 map <C-j> <C-W>j
