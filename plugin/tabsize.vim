@@ -1,3 +1,4 @@
+" set tabstop, softtabstop and shiftwidth to the same value
 command! -nargs=* Stab call Stab()
 
 function! Stab()
