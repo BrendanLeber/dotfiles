@@ -30,6 +30,12 @@ set relativenumber
 set visualbell
 set tabstop=4 softtabstop=4 shiftwidth=4 expandtab
 
+" rapidly toggle `set list`
+nmap <leader>l :set list!<CR>
+
+" use the same symbols as TextMate for tabstops and EOLs
+set listchars=tab:▸\ ,eol:¬
+
 syntax enable
 set t_Co=256
 set t_ut=
