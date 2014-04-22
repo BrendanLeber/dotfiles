@@ -1,6 +1,6 @@
 filetype off
 if !exists("g:loaded_pathogen")
-    call pathogen#runtime_append_all_bundles()
+    call pathogen#infect()
     call pathogen#helptags()
 endif
 filetype plugin indent on
