@@ -1,0 +1,20 @@
+[user]
+    name = Brendan Leber
+    email = brendan@brendanleber.com
+
+[alias]
+    st = status
+    ci = commit
+    tags = tag -l
+    branches = branch -a
+    remotes = remote -v
+
+[color]
+    ui = auto
+    branch = auto
+    diff = auto
+    interactive = auto
+    status = auto
+
+[credential]
+    helper = cache
