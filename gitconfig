@@ -20,4 +20,4 @@
     helper = cache
 
 [push]
-    default = simple
+    default = matching

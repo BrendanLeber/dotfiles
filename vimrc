@@ -30,9 +30,6 @@ set relativenumber
 set visualbell
 set tabstop=4 softtabstop=4 shiftwidth=4 expandtab
 
-" rapidly toggle `set list`
-nmap <leader>l :set list!<CR>
-
 " use the same symbols as TextMate for tabstops and EOLs
 set listchars=tab:▸\ ,eol:¬
 
@@ -95,6 +92,12 @@ noremap <leader>h :nohl<cr>
 
 noremap <leader>ls :!ls $(dirname %)<cr>
 noremap <leader>la :!ls -al $(dirname %)<cr>
+
+" always display the "invisible" characters by default
+set list
+
+" rapidly toggle `set list`
+nmap <leader>l :set list!<CR>
 
 " switch between windows easier
 map <C-j> <C-W>j

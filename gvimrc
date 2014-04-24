@@ -1,9 +1,9 @@
-set guifont=Consolas:h12:cANSI
+"set guifont=Consolas:h12:cANSI
 
 " Solarized light sounds like a nice colorscheme
 syntax enable
-set background=light
-colorscheme solarized
+"set background=light
+"colorscheme solarized
 
 set guioptions-=m	" no menu bar
 set guioptions-=T	" no toolbar
