@@ -152,3 +152,16 @@ fi
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
+
+# enable perlbrew if it has been installed on this system
+if [ -f ~/perl5/perlbrew/etc/bashrc ]; then
+    source ~/perl5/perlbrew/etc/bashrc
+fi
+
+# enable the Android SDK tools if they've been installed
+if [ -d ~/adt-bundle-linux/sdk/tools ]; then
+    export PATH=$PATH:~/adt-bundle-linux/sdk/tools
+fi
+if [ -d ~/adt-bundle-linux/sdk/platform-tools ]; then
+    export PATH=$PATH:~/adt-bundle-linux/sdk/platform-tools
+fi
