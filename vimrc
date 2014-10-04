@@ -124,6 +124,6 @@ nmap _$ :call Preserve("%s/\\s\\+$//e")<CR>
 nmap _= :call Preserve("normal gg=G")<CR>
 
 " read in Isilon specific settings if it exists
-if filereadable("~/.isilon.vim")
-    source ~/.isilon.vim
+if filereadable("~/isilon.vim")
+    source ~/isilon.vim
 endif
