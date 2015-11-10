@@ -99,21 +99,6 @@ if [ -d ~/go ] ; then
     export PATH="$PATH:$GOPATH/bin"
 fi
 
-# Isilon Test Setup Environment Variables
-export QA=/usr/local/qa
-export TOOLS=/usr/local/tools
-export QALIB=$QA/lib
-export PERL5LIB=$QA/lib
-export PATH=$QA/bin:$QA/tests:$QA/linux/bin:$TOOLS:$PATH
-
-# commonly used regex's for Isilon clusters and logs
-export LINS="[0-9a-f]+:[0-9a-f]{4}:[0-9a-f]{4}[\:]*[0-9A-H]*"
-export BLOCKS="[0-9]+,[0-9]+,[0-9]+[\:0-9]+"
-export BADDR="[0-9]+,[0-9]+,[0-9]+:8192"
-export IADDR="[0-9]+,[0-9]+,[0-9]+:512"
-export OFSVERSION="\<v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\>"
-export OFSBRANCH="\<B_[0-9]+_[0-9]+_[0-9]+_[0-9]+(\w\+)\>"
-
 # only set the term capabilities to support 256 color if we're not in tmux
 [ -z $TMUX ] && export TERM=xterm-256color
 
