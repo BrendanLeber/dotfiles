@@ -100,6 +100,9 @@
 
 
 ;;;; color/font customizations
+(use-package spacegray-theme
+  :ensure t)
+
 (if (display-graphic-p)
     (load-theme 'spacegray t)
   (load-theme 'material t))
