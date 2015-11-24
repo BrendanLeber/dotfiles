@@ -5,7 +5,7 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-export EDITOR=vim
+export EDITOR=vi
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -156,3 +156,7 @@ if [ -d ~/bin ] ; then
     export PATH="~/bin:$PATH"
 fi
 
+# add GnuPG Agent environtment variables, if they exist
+if [ -f ~/.gnupg/gpg-agent-info ]; then
+    source ~/.gnupg/gpg-agent-info
+fi
