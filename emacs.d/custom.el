@@ -10,8 +10,8 @@
  '(backup-directory-alist (quote (("." . "~/.emacs.d/backups"))))
  '(c-default-style
    (quote
-    ((c-mode . "bsd")
-     (c++-mode . "bsd")
+    ((c-mode . "stroustrup")
+     (c++-mode . "stroustrup")
      (java-mode . "java")
      (awk-mode . "awk")
      (other . "gnu"))))
@@ -47,17 +47,9 @@
  '(package-archives
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
-     ("melpa" . "http://melpa.org/packages/"))))
- '(rcirc-authinfo
-   (quote
-    (("irc.west.isilon.com" nickserv "brendanl" "yensid"))))
- '(rcirc-fill-column (quote frame-width))
- '(rcirc-keywords (quote ("bleber" "brendanl")))
- '(rcirc-server-alist
-   (quote
-    (("irc.west.isilon.com" :nick "brendanl" :full-name "Brendan Leber" :channels
-      ("#pre" "#ime" "#dev" "#network")))))
- '(rcirc-track-minor-mode t)
+     ("melpa" . "https://melpa.org/packages/"))))
+ '(read-buffer-completion-ignore-case t)
+ '(read-file-name-completion-ignore-case t)
  '(reb-re-syntax (quote string))
  '(require-final-newline t)
  '(safe-local-variable-values (quote ((hl-sexp-mode) (rainbow-mode . t))))
@@ -68,11 +60,11 @@
  '(tool-bar-mode nil)
  '(tooltip-use-echo-area t)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify))
- '(user-mail-address "brendan.leber@isilon.com")
+ '(user-mail-address "brendan@brendanleber.com")
  '(x-select-request-type (quote (COMPOUND_TEXT UTF8_STRING STRING TEXT))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:height 128 :family "Source Code Pro")))))
+ '(default ((t (:height 100 :family "Source Code Pro")))))

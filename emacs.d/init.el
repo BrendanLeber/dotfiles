@@ -15,7 +15,7 @@
 
 (set-register ?I `(file . ,user-init-file))
 (set-register ?C `(file . ,custom-file))
-(set-register ?A `(file . ,(expand-file-name "~/Documents/isilon.org")))
+(set-register ?A `(file . ,(expand-file-name "~/Documents/agenda.org")))
 
 
 ;;;; some things i haven't found a way to store in custom.el
@@ -101,6 +101,9 @@
 
 ;;;; color/font customizations
 (use-package spacegray-theme
+  :ensure t)
+
+(use-package material-theme
   :ensure t)
 
 (if (display-graphic-p)
@@ -205,37 +208,6 @@ the major programming modes.  `c-mode', `c++-mode', `java-mode', `asm-mode'."
 ;;;; c/c++
 (require 'cc-mode)
 
-;; (defvar isilon-c-style
-;;   '("isilon" "bsd"
-;;     (indent-tabs-mode	    . t)
-;;     (fill-column	    . 78)
-;;     (c-block-comment-prefix . "* ")
-;;     (c-offsets-alist        . (
-;;                                (defun-block-intro     . +)
-;;                                (statement-block-intro . +)
-;;                                (statement-case-intro  . +)
-;;                                (substatement-open     . *)
-;;                                (substatement	      . +)
-;;                                (inclass               . +)
-;;                                (knr-argdecl-intro     . 0)
-;;                                (arglist-close	      . 0)
-;;                                (arglist-cont-nonempty . *)
-;;                                (inline-open           . 0)
-;;                                (case-label	      . 0)
-;;                                (statement-cont        . *)
-;;                                (label		      . 1)
-;;                                (access-label          . -)
-;;                                (inclass               . +))))
-;;   "EMC/Isilon indenting style for C/C++ code.")
-
-(defun isilon-c-mode-common-hook ()
-  (setq indent-tabs-mode t)
-  (setq fill-column 78)
-  (setq column-number-mode t)
-  (c-set-offset 'arglist-cont-nonempty '*))
-
-(add-hook 'c-mode-common-hook 'isilon-c-mode-common-hook)
-
 (bind-key "C-;" 'comment-region c-mode-base-map)
 (bind-key "C-c o" 'ff-find-other-file c-mode-base-map)
 (bind-key "C-c w" 'delete-trailing-whitespace c-mode-base-map)
@@ -326,17 +298,39 @@ directory to make multiple eshell windows easier."
   (delete-window))
 
 
-;;;; irc (rcirc)
-(use-package rcirc-notify
+;;;; irc (erc)
+(use-package erc
   :ensure t
   :bind ("C-c I" . irc)
   :init
-  (defun my-rcirc-mode-hook ()
-    (flyspell-mode 1)
-    (rcirc-omit-mode)
-    (set (make-local-variable 'scroll-conservatively) 8192))
+  (make-variable-buffer-local 'erc-fill-column)
+  (add-hook 'window-configuration-change-hook
+            '(lambda ()
+               (save-excursion
+                 (walk-windows
+                   (lambda (w)
+                     (let ((buffer (window-buffer w)))
+                       (set-buffer buffer)
+                       (when (eq major-mode 'erc-mode)
+                         (setq erc-fill-column (- (window-width w) 2)))))))))
   :config
-  (add-hook 'rcirc-mode-hook 'my-rcirc-mode-hook))
+  (setq erc-prompt-for-nickserv-password nil
+        erc-hide-list '("JOIN" "PART" "QUIT" "NICK" "MODE")
+        erc-auto-query 'buffer
+        erc-server-auto-reconnect t
+        erc-server-reconnect-attempts 5
+        erc-server-reconnect-timeout 3
+        erc-rename-buffers t
+        erc-interpret-mirc-color t)
+  (add-to-list 'erc-mode-hook (lambda ()
+                                (set (make-local-variable 'scroll-conservatively) 101))))
+
+;  (defun my-rcirc-mode-hook ()
+;    (flyspell-mode 1)
+;    (rcirc-omit-mode)
+;    (set (make-local-variable 'scroll-conservatively) 8192))
+;  :config
+;  (add-hook 'rcirc-mode-hook 'my-rcirc-mode-hook))
 
 
 ;;;; wrap region
@@ -403,13 +397,19 @@ sorted, and left with one intervening blank line between each of them."
   (goto-char (point-min)))
 
 
+;;;; which-key gives extra help on keys
+(use-package which-key
+  :ensure t
+  :diminish which-key-mode
+  :config (which-key-mode))
+
 ;;;; emacs server/client
 ;; (require 'server)
 
-;; (defun server-shutdown ()
-;;   "Save buffers, quit and shutdown the Emacs server."
-;;   (interactive)
-;;   (save-some-buffers)
-;;   (kill-emacs))
+(defun server-shutdown ()
+  "Save buffers, quit and shutdown the Emacs server."
+  (interactive)
+  (save-some-buffers)
+  (kill-emacs))
 
 ;; (or (server-running-p) (server-start))
