@@ -5,7 +5,8 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-export EDITOR=vi
+export EDITOR="emacsclient --tty"
+export VISUAL="emacsclient --create-frame --alternate-editor=emacs"
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -93,12 +94,6 @@ if [ -d ~/algs4/bin ] ; then
     export PATH="~/algs4/bin:$PATH"
 fi
 
-# if we have a go workspace add it to our path
-if [ -d ~/go ] ; then
-    export GOPATH="~/go"
-    export PATH="$PATH:$GOPATH/bin"
-fi
-
 # only set the term capabilities to support 256 color if we're not in tmux
 [ -z $TMUX ] && export TERM=xterm-256color
 
@@ -143,6 +138,11 @@ if [ -f ~/perl5/perlbrew/etc/bashrc ]; then
     source ~/perl5/perlbrew/etc/bashrc
 fi
 
+# enable rakudobrew if it has been installed on this system
+if [ -f ~/.rakudobrew/bin/rakudobrew ]; then
+    export PATH=~/.rakudobrew/bin:$PATH
+fi
+
 # enable the Android SDK tools if they've been installed
 if [ -d ~/adt-bundle-linux/sdk/tools ]; then
     export PATH=$PATH:~/adt-bundle-linux/sdk/tools
@@ -151,12 +151,14 @@ if [ -d ~/adt-bundle-linux/sdk/platform-tools ]; then
     export PATH=$PATH:~/adt-bundle-linux/sdk/platform-tools
 fi
 
-# if we have a local bin directory add it to our path
-if [ -d ~/bin ] ; then
-    export PATH="~/bin:$PATH"
+# add GnuPG Agent environtment variables, if they exist
+if [ -f ~/.gnupg/gpg-agent-info-$(hostname) ]; then
+    source ~/.gnupg/gpg-agent-info-$(hostname)
+elif [ -f ~/.gnupg/gpg-agent-info ]; then
+    source ~/.gnupg/gpg-agent-info
 fi
 
-# add GnuPG Agent environtment variables, if they exist
-if [ -f ~/.gnupg/gpg-agent-info ]; then
-    source ~/.gnupg/gpg-agent-info
+# if we have a local bin directory add it to our path, leave at end
+if [ -d ~/bin ] ; then
+    export PATH="~/bin:$PATH"
 fi
