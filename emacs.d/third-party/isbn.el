@@ -2688,7 +2688,7 @@ unchanged.  Return T on success, and NIL on failure."
 (defun isbn-squeeze-hyphens (isbn)
   "Return a copy of ISBN with hyphens removed."
   (let ((new-isbn ""))
-    (mapcar '(lambda (s)
+    (mapcar #'(lambda (s)
 	       (setq new-isbn
 		     (concat new-isbn (if (= s ?-) ""
 					(char-to-string s))))) isbn)
