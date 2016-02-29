@@ -25,10 +25,14 @@
 
 
 ;;;; always try to use UTF-8 for encoding
-(prefer-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+(when (display-graphic-p)
+   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
 
 (autoload 'zap-up-to-char "misc"
@@ -98,6 +102,19 @@
 (add-to-list 'load-path third-party-dir)
 (add-to-list 'load-path modules-dir)
 
+(defvar *saved-gc-cons-threshold*
+  gc-cons-threshold
+  "Save the current `gc-cons-threshold' for restoring later.")
+
+(defun my-minibuffer-setup-hook ()
+  (setq *saved-gc-cons-threshold* gc-cons-threshold)
+  (setq gc-cons-threshold most-positive-fixnum))
+
+(defun my-minibuffer-exit-hook ()
+  (setq gc-cons-threshold *saved-gc-cons-threshold*))
+
+(add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
+(add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
 
 ;;;; color/font customizations
 (use-package spacegray-theme
@@ -166,22 +183,32 @@ originally in."
 (use-package emacs-lisp-mode
   :preface (provide 'emacs-lisp-mode)
   :config
-  (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-  (add-hook 'emacs-lisp-mode-hook 'remove-elc-on-save)
-  (bind-key "RET" 'reindent-then-newline-and-indent emacs-lisp-mode-map)
-  (bind-key "C-\\" 'lisp-complete-symbol emacs-lisp-mode-map)
-  (bind-key "C-;" 'comment-region emacs-lisp-mode-map)
-  (bind-key "C-c t" 'indent-buffer emacs-lisp-mode-map)
-  (bind-key "C-c v" 'eval-buffer emacs-lisp-mode-map)
-  (bind-key "M-." 'find-function-at-point emacs-lisp-mode-map)
+  (add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
+  (add-hook 'emacs-lisp-mode-hook #'remove-elc-on-save)
+  (bind-key "RET" #'reindent-then-newline-and-indent emacs-lisp-mode-map)
+  (bind-key "C-\\" #'lisp-complete-symbol emacs-lisp-mode-map)
+  (bind-key "C-;" #'comment-region emacs-lisp-mode-map)
+  (bind-key "C-c t" #'indent-buffer emacs-lisp-mode-map)
+  (bind-key "C-c v" #'eval-buffer emacs-lisp-mode-map)
+  (bind-key "M-." #'find-function-at-point emacs-lisp-mode-map)
+  (bind-key "#" #'fn-sharp emacs-lisp-mode-map)
   (defun remove-elc-on-save ()
     "If you're saving an elisp file, likely the .elc is no longer valid."
     (make-local-variable 'after-save-hook)
-    (add-hook 'after-save-hook 'remove-elc-on-save-hook))
+    (add-hook 'after-save-hook #'remove-elc-on-save-hook))
   (defun remove-elc-on-save-hook ()
     "Function run in the after-save hook to remove the .elc when saving an .el file."
     (if (file-exists-p (concat buffer-file-name "c"))
-        (delete-file (concat-buffer-file-name "c")))))
+        (delete-file (concat-buffer-file-name "c"))))
+  (defun fn-sharp ()
+    "Insert #' unless in a string or comment."
+    (interactive)
+    (call-interactively #'self-insert-command)
+    (let ((ppss (syntax-ppss)))
+      (unless (or (elt ppss 3)
+                  (elt ppss 4)
+                  (eq (char-after) ?'))
+        (insert "'")))))
 
 
 ;;;; gnu global (gtags)
@@ -268,6 +295,17 @@ Uses `vc.el' or `rcs.el' depending on `ediff-version-control-package'."
   :ensure t)
 
 
+(use-package org-bullets
+  :ensure t
+  :init
+  (setq org-bullets-bullet-list '("◉" "◎" "⚫" "○" "►" "◇"))
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "✔ DONE(d)")
+                          (sequence "⚑ WAITING(w)" "|")
+                          (sequence "|" "✘ CANCELED(c)")))
+
 ;;;; Markdown mode
 (use-package markdown-mode
   :ensure t
@@ -308,11 +346,11 @@ directory to make multiple eshell windows easier."
             '(lambda ()
                (save-excursion
                  (walk-windows
-                   (lambda (w)
-                     (let ((buffer (window-buffer w)))
-                       (set-buffer buffer)
-                       (when (eq major-mode 'erc-mode)
-                         (setq erc-fill-column (- (window-width w) 2)))))))))
+                  (lambda (w)
+                    (let ((buffer (window-buffer w)))
+                      (set-buffer buffer)
+                      (when (eq major-mode 'erc-mode)
+                        (setq erc-fill-column (- (window-width w) 2)))))))))
   :config
   (setq erc-prompt-for-nickserv-password nil
         erc-hide-list '("JOIN" "PART" "QUIT" "NICK" "MODE")
@@ -325,12 +363,12 @@ directory to make multiple eshell windows easier."
   (add-to-list 'erc-mode-hook (lambda ()
                                 (set (make-local-variable 'scroll-conservatively) 101))))
 
-;  (defun my-rcirc-mode-hook ()
-;    (flyspell-mode 1)
-;    (rcirc-omit-mode)
-;    (set (make-local-variable 'scroll-conservatively) 8192))
-;  :config
-;  (add-hook 'rcirc-mode-hook 'my-rcirc-mode-hook))
+                                        ;  (defun my-rcirc-mode-hook ()
+                                        ;    (flyspell-mode 1)
+                                        ;    (rcirc-omit-mode)
+                                        ;    (set (make-local-variable 'scroll-conservatively) 8192))
+                                        ;  :config
+                                        ;  (add-hook 'rcirc-mode-hook 'my-rcirc-mode-hook))
 
 
 ;;;; wrap region
@@ -356,44 +394,44 @@ directory to make multiple eshell windows easier."
 at the start of the file are left in place.  The remaining entries are
 sorted, and left with one intervening blank line between each of them."
   (interactive)
-  (let ((sort-tag "\001SORT-TAG:"))	;sort-tag is a unique prefix string
+  (let ((sort-tag "\001SORT-TAG:"))     ;sort-tag is a unique prefix string
     (goto-char (point-min))
-    (insert "\f" sort-tag "\001\n")	;Ctl-A tag ensures we keep @string{}
-    (while				;stuff in first page
-	(re-search-forward "^@string" nil t)) ;skip past @string{} entries
+    (insert "\f" sort-tag "\001\n")     ;Ctl-A tag ensures we keep @string{}
+    (while                              ;stuff in first page
+        (re-search-forward "^@string" nil t)) ;skip past @string{} entries
     (save-excursion
-      (while				;find bibliography entry
-	  (re-search-forward "^@[^{]*{" nil t)
-	(progn
-	  (let ((the-tag))
-	    (let ((k (point)))
-	      (end-of-line)
-	      (setq the-tag (buffer-substring k (point))))
-	    (beginning-of-line)
-	    (let ((k (point)))
-	      (insert "\f" sort-tag the-tag "\n") ;and tag it for sorting
-	      (upcase-region k (point))) ;alas, sort is case-sensitive
-	    (forward-line 1)))))
+      (while                            ;find bibliography entry
+          (re-search-forward "^@[^{]*{" nil t)
+        (progn
+          (let ((the-tag))
+            (let ((k (point)))
+              (end-of-line)
+              (setq the-tag (buffer-substring k (point))))
+            (beginning-of-line)
+            (let ((k (point)))
+              (insert "\f" sort-tag the-tag "\n") ;and tag it for sorting
+              (upcase-region k (point))) ;alas, sort is case-sensitive
+            (forward-line 1)))))
     (sort-pages nil (point-min) (point-max)) ;do the sort
     (goto-char (point-min))
-    (flush-lines sort-tag))		;remove the sort tags
+    (flush-lines sort-tag))             ;remove the sort tags
   (goto-char (point-min))
-  (replace-string "\f" "")		;remove left-over page marks
+  (replace-string "\f" "")              ;remove left-over page marks
   (goto-char (point-min))
   (while
       (re-search-forward "^@string" nil t)) ;skip past @string{} entries
-  (while				;find bibliography entry
+  (while                                ;find bibliography entry
       (re-search-forward "^@[^{]*{" nil t)
     (progn
       (beginning-of-line)
-      (insert "\n\n")			;and regularize space before it
+      (insert "\n\n")                   ;and regularize space before it
       (forward-line -1)
       (delete-blank-lines)
       (forward-line 2)))
   (goto-char (point-max))
   (delete-blank-lines)
   (goto-char (point-min))
-  (replace-regexp "[ \t]+$" "")		;blank trim lines
+  (replace-regexp "[ \t]+$" "")         ;blank trim lines
   (goto-char (point-min)))
 
 

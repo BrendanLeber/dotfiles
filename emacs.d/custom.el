@@ -57,6 +57,7 @@
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
  '(show-trailing-whitespace t)
+ '(tab-always-indent (quote complete))
  '(tool-bar-mode nil)
  '(tooltip-use-echo-area t)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify))
@@ -67,4 +68,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:height 100 :family "Source Code Pro")))))
+ '(default ((((class color) (min-colors 89)) (:foreground "#ffffff" :background "#262626")))))
