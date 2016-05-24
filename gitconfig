@@ -19,16 +19,17 @@
     le = log --oneline --decorate
     dl = "!git ll -1"
     dlc = diff --cached HEAD^
+    last = log -1 HEAD
 
 [color]
     ui = auto
-    branch = auto
-    diff = auto
-    interactive = auto
-    status = auto
+    interactive = always
 
 [credential]
     helper = cache
 
 [push]
     default = matching
+
+[core]
+    excludesfile = ~/.gitignore_global
