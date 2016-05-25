@@ -1,3 +1,5 @@
 elpa/
+backups/
 auto-save-list/
 ido.last
+configuration.el

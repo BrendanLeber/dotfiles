@@ -1,0 +1,791 @@
+#+TITLE: My Emacs Configuration
+
+* Set Personal Information
+
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Brendan Leber"
+        user-mail-address "brendan.leber@isilon.com"
+        calendar-latitude 47.598347
+        calendar-longitude -122.344133
+        calendar-location-name "Seattle, WA")
+#+END_SRC
+
+* Backups
+
+  This is one of the things people usually want to change right away.
+  By default, Emacs saves backup files in the current directory.
+  These are the files ending in ~ that are cluttering up your
+  directory lists.  The following code stashes them all in
+  ~/.emacs.d/backups, where I can find them with C-x C-f (find-file)
+  if I really need to.
+
+#+BEGIN_SRC emacs-lisp
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+#+END_SRC
+
+  Disk space is cheap. Save lots.
+
+#+BEGIN_SRC emacs-lisp
+  (setq delete-old-versions -1)
+  (setq version-control t)
+  (setq vc-make-backup-files t)
+  (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+#+END_SRC
+
+* General Settings
+
+  Make some short cuts for loading common files
+
+#+BEGIN_SRC emacs-lisp
+(set-register ?A `(file . ,(expand-file-name "~/Documents/isilon.org")))
+(set-register ?C `(file . ,(expand-file-name "configuration.org" user-emacs-directory)))
+(set-register ?I `(file . ,user-init-file))
+#+END_SRC
+
+  Hey, I want to use a few of these features
+
+#+BEGIN_SRC emacs-lisp
+(put 'downcase-region             'disabled nil)   ; Let downcasing work
+(put 'upcase-region               'disabled nil)   ; Let upcasing work
+(put 'erase-buffer                'disabled nil)
+(put 'eval-expression             'disabled nil)   ; Let ESC-ESC work
+(put 'narrow-to-page              'disabled nil)   ; Let narrowing work
+(put 'narrow-to-region            'disabled nil)   ; Let narrowing work
+(put 'set-goal-column             'disabled nil)
+(put 'company-coq-fold            'disabled nil)
+(put 'TeX-narrow-to-group         'disabled nil)
+(put 'LaTeX-narrow-to-environment 'disabled nil)
+#+END_SRC
+
+  Always try to use UTF-8 for encoding.
+
+#+BEGIN_SRC emacs-lisp
+  (setq locale-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
+  (when (display-graphic-p)
+    (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-screen t
+        load-prefer-newer t
+        indent-tabs-mode nil
+        require-final-newline t)
+  (show-paren-mode)
+#+END_SRC
+
+* User Interface Customization/Chrome
+
+** Disable Window Chrome
+
+   Turn off things I don't care to see.
+
+#+BEGIN_SRC emacs-lisp
+  (tool-bar-mode 0)
+  (menu-bar-mode 0)
+  (scroll-bar-mode -1)
+#+END_SRC
+
+** Diminish minor-modes we don't need to see
+
+#+BEGIN_SRC emacs-lisp
+(diminish 'auto-fill-mode)
+#+END_SRC
+
+** Advice for window/frame 
+
+#+BEGIN_SRC emacs-lisp
+  (defadvice quit-window (before quit-window-always-kill)
+    "When running `quit-window', always kill the buffer."
+    (ad-set-arg 0 t))
+  (ad-activate 'quit-window)
+#+END_SRC
+
+** Color/Theme
+
+#+BEGIN_SRC emacs-lisp
+  (use-package color-theme     :ensure t)
+  (use-package spacegray-theme :ensure t)
+  (load-theme 'spacegray t)
+#+END_SRC
+
+** Set default font and configure font re-sizing
+
+   I'm partial to Source Code Pro.  I think a bigger size looks better on
+   a Mac (especially since I'm usually using a large display when I'm
+   on a Mac).
+
+   The standard =text-scale-= functions just resize the text in the
+   current buffer; I'd generally like to resize the text in /every/
+   buffer, and I usually want to change the size of the modeline, too
+   (this is especially helpful when presenting).  These functions and
+   bindings let me resize everything all together!
+
+#+BEGIN_SRC emacs-lisp
+  (setq bml/default-font "Source Code Pro")
+  (setq bml/default-font-size 12)
+  (setq bml/current-font-size bml/default-font-size)
+  (setq bml/font-change-increment 1.1)
+
+  (defun bml/set-font-size ()
+    "Set the font to `bml/default-font' at `bml/current-font-size'."
+    (set-frame-font
+     (concat bml/default-font "-" (number-to-string bml/current-font-size))))
+
+  (defun bml/reset-font-size ()
+    "Change font size back to `bml/default-font-size'."
+    (interactive)
+    (setq bml/current-font-size bml/default-font-size)
+    (bml/set-font-size))
+
+  (defun bml/increase-font-size ()
+    "Increase current font size by a factor of `bml/font-change-increment'."
+    (interactive)
+    (setq bml/current-font-size
+          (ceiling (* bml/current-font-size bml/font-change-increment)))
+    (bml/set-font-size))
+
+  (defun bml/decrease-font-size ()
+    "Decrease current font size by a factor of `bml/font-change-increment', down to a minimum size of 1."
+    (interactive)
+    (setq bml/current-font-size
+          (max 1
+               (floor (/ bml/current-font-size bml/font-change-increment))))
+    (bml/set-font-size))
+
+  (bml/reset-font-size)
+
+  (bind-key "C-)" #'bml/reset-font-size)
+  (bind-key "C-+" #'bml/increase-font-size)
+  (bind-key "C-=" #'bml/increase-font-size)
+  (bind-key "C-_" #'bml/decrease-font-size)
+  (bind-key "C--" #'bml/decrease-font-size)
+#+END_SRC
+
+* Speed-up Operations by Pausing GC passes
+
+  Don't garbage collect when using the mini-buffer.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar *saved-gc-cons-threshold*
+    gc-cons-threshold
+    "The value of `gc-cons-threshold' saved when entering the minibuffer
+  and restored when leaving.")
+
+  (defun bml/minibuffer-setup-hook ()
+    (setq *saved-gc-cons-threshold* gc-cons-threshold)
+    (setq gc-cons-threshold most-positive-fixnum))
+
+  (defun bml/minibuffer-exit-hook ()
+    (setq gc-cons-threshold *saved-gc-cons-threshold*))
+
+  (add-hook 'minibuffer-setup-hook #'bml/minibuffer-setup-hook)
+  (add-hook 'minibuffer-exit-hook #'bml/minibuffer-exit-hook)
+#+END_SRC
+
+* Utility Functions
+
+  Some functions of mine, or that I "borrowed" from the internet, that
+  make life in Emacs easier.
+
+** Reload Settings
+
+   These little helper functions let me access and reload my
+   configuration whenever I want to make any changes.
+
+#+BEGIN_SRC emacs-lisp
+  (defun reload-settings ()
+    (interactive)
+    (org-babel-load-file "~/.emacs.d/configuration.org"))
+
+  (defun settings ()
+    (interactive)
+    (find-file "~/.emacs.d/configuration.org"))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (defun bml/load-if-exists (file)
+    "Load `file` if it exists."
+    (when (file-exists-p file)
+      (load file)))
+
+  (defun bml/unfill-paragraph ()
+    "Takes a multi-line paragraph and makes it into a single line of text."
+    (interactive)
+    (let ((fill-column (point-max)))
+      (fill-paragraph nil)))
+
+  (defun bml/unfill-region (begin end)
+    "Change isolated newlines in region into spaces."
+    (interactive (if (use-region-p)
+                     (list (region-beginning) (region-end))
+                   (list nil nil)))
+    (save-restriction
+      (narrow-to-region (or begin (point-min)) (or end (point-max)))
+      (goto-char (point-min))
+      (while (search-forward "\n" nil t)
+        (if (eq (char-after) ?\n)
+            (skip-chars-forward "\n")
+          (delete-char -1)
+          (insert ?\s)))))
+
+  (defun bml/kill-current-buffer ()
+    "Kill the current buffer without prompting."
+    (interactive)
+    (kill-buffer (current-buffer)))
+
+  (defun bml/indent-buffer ()
+    "Indent the entire buffer based on the current mode settings."
+    (interactive)
+    (save-excursion
+      (indent-region (point-min) (point-max))))
+
+  (defun bml/narrow-to-line (&optional arg)
+    "Narrow to the text of the current line.
+  A numeric prefix arg means move forward (backward if negative) that
+  many lines, thus narrowing to a line other than the one point was
+  originally in."
+    (interactive "P")
+    (setq arg (if arg
+                  (prefix-numeric-value arg)
+                0))
+    (let ((inhibit-field-motion t))
+      (save-excursion
+        (forward-line arg)
+        (narrow-to-region (line-beginning-position) (line-end-position)))))
+
+  (defun bml/switch-to-previous-buffer ()
+    "Switch to most recent buffer. Repeated calls toggle back and forth between the most recent two buffers."
+    (interactive)
+    (switch-to-buffer (other-buffer (current-buffer) 1)))
+
+  (bind-key "C-`" #'bml/switch-to-previous-buffer)
+#+END_SRC
+
+* Packages
+
+** discover
+
+#+BEGIN_SRC emacs-lisp
+  (use-package discover
+    :ensure t
+    :config
+    (global-discover-mode 1))
+#+END_SRC
+
+** flyspell
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flyspell
+    :diminish flyspell-mode)
+#+END_SRC
+
+** magit
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t
+    :commands magit-status
+    :init
+    (defadvice magit-status (around magit-fullscreen activate)
+      (window-configuration-to-register :magit-fullscreen)
+      ad-do-it
+      (delete-other-windows))
+    :config
+    (setq magit-branch-argumnets nil
+          ;; use ido to look for branches
+          magit-completing-read-function 'magit-ido-completing-read
+          ;; don't put "origin-" in front of new branch names by defualt
+          magit-default-tracking-name-function #'magit-default-tracking-name-branch-only
+          magit-push-always-verify nil
+          ;; get rid of the previous advice to go fullscreen
+          magit-restore-window-configuration t)
+    :bind ("C-x g" . magit-status))
+#+END_SRC
+
+** org-mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure t
+    :bind (("C-c a" . org-agenda)
+           ("C-c c" . org-capture)
+           ("C-c l" . org-store-link))
+    :init
+    (setq org-agenda-window-setup (quote current-window))
+    (setq org-src-fontify-natively t)
+    (setq org-src-tab-acts-natively t)
+    (setq org-src-window-setup 'current-window)
+    (defface org-block-begin-line
+      '((t (:foreground "#99968b" :background "#303030")))
+      "Face used for the line delimiting the begin of source blocks.")
+    (defface org-block-end-line
+      '((t (:foreground "#99968b" :background "#303030")))
+      "Face used for the line delimiting the end of source blocks.")
+    :config
+    (add-hook 'org-mode-hook #'flyspell-mode)
+    (add-hook 'org-mode-hook #'auto-fill-mode))
+#+END_SRC
+
+*** Pretty bullets in org-mode
+
+#+BEGIN_SRC emacs-lisp
+;; (use-package org-bullets
+;;   :ensure t
+;;   :init
+;;   (setq org-bullets-bullet-list '("◉" "◎" "⚫" "○" "►" "◇"))
+;;   (defun turn-on-org-bullets-mode ()
+;;     (org-bullets-mode 1))
+;;   :config
+;;   (add-hook 'org-mode-hook #'turn-on-org-bullets-mode))
+#+END_SRC
+
+*** Export to MediaWiki since we use that at EMC/Isilon
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ox-mediawiki
+    :ensure t)
+#+END_SRC
+
+** smartscan-mode
+
+   Quickly jumps between other symbols found at point in Emacs.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package smartscan
+    :ensure t
+    :config
+    (add-hook 'prog-mode-hook 'smartscan-mode-turn-on))
+#+END_SRC
+
+** Trailing whitespace
+
+   We want to show trailing whitespace.  Trailing whitespace is the
+   devil.
+
+   ...but sometimes (especially in read-only buffers that I don't
+   control), this gets annoying.  Which is why we can add this small
+   function to any hook that we want.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package whitespace
+    :config
+    (setq-default show-trailing-whitespace t)
+    (defun no-trailing-whitespace ()
+      (setq show-trailing-whitespace nil)))
+#+END_SRC
+
+   Don't show trailing whitespace in some modes.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'minibuffer-setup-hook #'no-trailing-whitespace)
+  (add-hook 'ielm-mode-hook #'no-trailing-whitespace)
+  (add-hook 'gdb-mode-hook #'no-trailing-whitespace)
+  (add-hook 'help-mode-hook #'no-trailing-whitespace)
+#+END_SRC
+
+** uniquify
+
+  Give buffers better unique names.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package uniquify
+    :config
+    (setq uniquify-buffer-name-style 'forward
+          uniquify-separator "/"
+          uniquify-after-kill-buffer-p t      ; rename after killing uniquified
+          uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
+#+END_SRC
+
+** volatile-highlights
+
+   Temporarily highlight changes from pasting, etc.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package volatile-highlights
+    :ensure t
+    :config
+    (volatile-highlights-mode t))
+#+END_SRC
+
+** whitespace-mode
+
+   Visualize blanks in source code.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package whitespace
+    :init
+    (setq whitespace-line-column nil
+          whitespace-display-mappings '((space-mark 32 [183] [46])
+                                        (newline-mark 10 [9166 10])
+                                        (tab-mark 9 [9654 9] [92 9])))
+    :config
+    (set-face-attribute 'whitespace-space nil :foreground "#666666" :background nil)
+    (set-face-attribute 'whitespace-newline nil :foreground "#666666" :background nil)
+    (set-face-attribute 'whitespace-indentation nil :foreground "#666666" :background nil)
+    :bind ("C-c T w" . whitespace-mode)
+    :diminish whitespace-mode)
+#+END_SRC
+
+** wrap-region
+
+#+BEGIN_SRC emacs-lisp
+  (use-package wrap-region
+    :ensure t
+    :config
+    (wrap-region-add-wrappers
+     '(("*" "*" nil org-mode)
+       ("~" "~" nil org-mode)
+       ("/" "/" nil org-mode)
+       ("=" "=" "+" org-mode)
+       ("_" "_" nil org-mode)
+       ("$" "$" nil (org-mode latex-mode))))
+    (add-hook 'org-mode-hook #'wrap-region-mode)
+    (add-hook 'latex-mode-hook #'wrap-region-mode))
+#+END_SRC
+
+** yasnippet
+
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :diminish yas-minor-mode
+    :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
+    :config
+    (yas-global-mode 1))
+#+END_SRC
+
+* Programming Support
+
+** General Stuff
+
+   First, lets have a way to show/hide trailing whitespace.
+
+#+BEGIN_SRC emacs-lisp
+  (defun bml/toggle-show-trailing-whitespace ()
+    "Toggle `show-trailing-whitespace' between t and nil."
+    (interactive)
+    (setq show-trailing-whitespace (not show-trailing-whitespace))
+    (redraw-display))
+
+  (defun bml/enable-show-trailing-whitespace ()
+    (setq show-trailing-whitespace t))
+
+  (add-hook 'prog-mode-hook #'bml/enable-show-trailing-whitespace)
+#+END_SRC
+
+*** whitespace-mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package whitespace
+    :init
+    (setq whitespace-line-column nil
+          whitespace-display-mappings '((space-mark 32 [183] [46])
+                                        (newline-mark 10 [9166 10])
+                                        (tab-mark 9 [9654 9] [92 9])))
+    :config
+    (set-face-attribute 'whitespace-space nil :foreground "#666666" :background nil)
+    (set-face-attribute 'whitespace-newline nil :foreground "#666666" :background nil)
+    (set-face-attribute 'whitespace-indentation nil :foreground "#666666" :background nil)
+    :diminish whitespace-mode)
+#+END_SRC
+
+*** fill-column-indicator
+
+#+BEGIN_SRC emacs-lisp
+  (use-package fill-column-indicator
+    :ensure t
+    :config
+    (add-hook 'prog-mode-hook 'fci-mode))
+#+END_SRC
+
+*** Gnu GLOBAL (gtags)
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ggtags
+    :ensure t
+    :init
+    (defun bml/maybe-turn-on-ggtags-mode ()
+      "Possibly turn on `ggtags-mode' if the current mode is derived from one of
+  the major programming modes.  `c-mode', `c++-mode', `java-mode', `asm-mode'."
+      (interactive)
+      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+        (ggtags-mode 1)))
+    
+    :bind (:map ggtags-mode-map
+                ("C-c g s" . ggtags-find-other-symbol)
+                ("C-c g h" . ggtags-view-tag-history)
+                ("C-c g r" . ggtags-find-reference)
+                ("C-c g f" . ggtags-find-file)
+                ("C-c g c" . ggtags-create-tags)
+                ("C-c g u" . ggtags-update-tags)
+                ("M-," . pop-tag-mark))
+
+    :config
+    (add-hook 'prog-mode-hook #'bml/maybe-turn-on-ggtags-mode))
+#+END_SRC
+
+*** magit
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t
+    :commands magit-status
+    :init
+    (defadvice magit-status (around magit-fullscreen activate)
+      (window-configuration-to-register :magit-fullscreen)
+      ad-do-it
+      (delete-other-windows))
+    :config
+    (setq magit-branch-argumnets nil
+          ;; use ido to look for branches
+          magit-completing-read-function 'magit-ido-completing-read
+          ;; don't put "origin-" in front of new branch names by defualt
+          magit-default-tracking-name-function #'magit-default-tracking-name-branch-only
+          magit-push-always-verify nil
+          ;; get rid of the previous advice to go fullscreen
+          magit-restore-window-configuration t)
+    :bind ("C-x g" . magit-status))
+#+END_SRC
+
+** C/C++
+
+#+BEGIN_SRC emacs-lisp
+  (use-package cc-mode
+    :ensure t
+    :init
+    (setq c-default-style '((c-mode . "bsd")
+                            (c++-mode . "bsd")
+                            (java-mode . "java")
+                            (awk-mode . "awk")
+                            (other . "gnu")))
+    (defun isilon/c-mode-common-hook ()
+      (setq indent-tabs-mode t)
+      (setq fill-column 78)
+      (setq column-number-mode t)
+      (c-set-offset 'arglist-cont-nonempty '*))
+    :bind (:map c-mode-base-map
+                ("C-;" . comment-region)
+                ("C-c o" . ff-find-other-file)
+                ("C-c w" . delete-trailing-whitespace)
+                ("C-M-a" . c-beginning-of-defun)
+                ("C-M-e" . c-end-of-defun)
+                ("RET" . reindent-then-newline-and-indent))
+
+    :config
+    (add-hook 'c-mode-common-hook #'isilon/c-mode-common-hook))
+#+END_SRC
+
+** Python
+
+#+BEGIN_SRC emacs-lisp
+  (use-package python
+    :ensure t
+    :init
+    (defun isilon/python-mode-hook ()
+      (set-variable 'py-indent-offset 4))
+    :bind (:map python-mode-map
+                ("C-;" . comment-region))
+    :config
+    (add-hook 'python-mode-hook #'isilon/python-mode-hook))
+#+END_SRC
+
+** Emacs Lisp (elisp)
+
+*** eldoc
+
+#+BEGIN_SRC emacs-lisp
+  (use-package eldoc
+    :ensure nil
+    :diminish eldoc-mode
+    :commands eldoc-mode)
+#+END_SRC
+
+*** emacs-lisp-mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package emacs-lisp-mode
+    :preface (provide 'emacs-lisp-mode)
+    :init
+    (defun remove-elc-on-save ()
+      "If you're saving an elisp file, likely the .elc is no longer valid."
+      (make-local-variable 'after-save-hook))
+    (defun remove-elc-on-save-hook ()
+      "Function run in the after-save hook to remove the .elc when saving an .el file."
+      (if (file-exists-p (concat buffer-file-name "c"))
+          (delete-file (concat-buffer-file-name "c"))))
+    :bind (:map emacs-lisp-mode-map
+                ("RET"   . reindent-then-newline-and-indent)
+                ("C-\\"  . lisp-complete-symbol)
+                ("C-c t" . indent-buffer)
+                ("C-c v" . eval-buffer)
+                ("M-."   . find-function-at-point))
+    :config
+    (add-hook 'after-save-hook #'remove-elc-on-save-hook)
+    (add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
+    (add-hook 'emacs-lisp-mode-hook #'remove-elc-on-save))
+#+END_SRC
+
+* Shells & Remote Shells
+
+** Smarter Shell
+
+   After reading Mickey Petersen's [[http://www.masteringemacs.org/articles/2010/12/13/complete-guide-mastering-eshell/][Mastering EShell]] article, I like
+   the /smart/ approach where the cursor stays on the command (where
+   it can be re-edited).  Sure, it takes a little while to get used
+   to...
+
+#+BEGIN_SRC elisp
+  (use-package eshell
+    :ensure t
+    :config
+    (use-package em-smart)
+    (setq eshell-where-to-jump 'begin)
+    (setq eshell-review-quick-commands nil)
+    (setq eshell-smart-space-goes-to-end t)
+    (setq eshell-scroll-to-bottom-on-input t)
+    (add-hook 'eshell-mode-hook #'eshell-smart-initialize))
+#+END_SRC
+
+** eshell aliases
+
+   A quick "x" alias that quickly exits and closes the window.
+
+#+BEGIN_SRC emacs-lisp
+  (defun eshell/x ()
+    "Closes the EShell session and gets rid of the EShell window."
+    (kill-buffer)
+    (delete-window))
+#+END_SRC
+
+** Shell Here
+
+   Now make a shell in the current directory.
+
+#+BEGIN_SRC emacs-lisp
+    (defun bml/eshell-here ()
+      "Opens up a new shell in the directory associated with the
+  current buffer's file.  The eshell is renamed to match that
+  directory to make multiple shell windows easier."
+      (interactive)
+      (let* ((parent (if (buffer-file-name)
+                         (file-name-directory (buffer-file-name))
+                       default-directory))
+             (height (/ (window-total-height) 3))
+             (name (car (last (split-string parent "/" t)))))
+        (split-window-vertically (- height))
+        (other-window 1)
+        (eshell "new")
+        (rename-buffer (concat "*eshell: " name "*"))
+        (insert (concat "ls"))
+        (eshell-send-input)))
+
+(bind-key "C-!" #'bml/eshell-here)
+#+END_SRC
+
+* Line Numbers
+
+  First, we customize the format that line-numbers are displayed with.
+  We also want the current line to be highlighted.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package linum
+    :config
+    (set-face-attribute 'linum nil
+                        :background (face-attribute 'default :background)
+                        :foreground (face-attribute 'font-lock-comment-face :foreground))
+    (defface linum-current-line-face
+      `((t :background "gray30" :foreground "gold"))
+      "Face for the currently active Line number")
+    (defvar my-linum-current-line-number 0)
+    (setq my-linum-format-string " %d ")
+    (defun my-linum-format (line-number)
+      (propertize (format my-linum-format-string line-number) 'face
+                  (if (eq line-number my-linum-current-line-number)
+                      'linum-current-line-face
+                    'linum)))
+    (setq linum-format 'my-linum-format)
+    (defadvice linum-update (around my-linum-update)
+      (let ((my-linum-current-line-number (line-number-at-pos)))
+        ad-do-it))
+    (ad-activate 'linum-update))
+#+END_SRC
+
+  Next, we configure the looks of relative-line-numbers-mode.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package relative-line-numbers
+    :config
+    (set-face-attribute 'relative-line-numbers-current-line nil
+                        :background "gray30" :foreground "gold")
+    (setq relative-line-numbers-motion-function 'forward-visible-line)
+    (setq relative-line-numbers-format
+          '(lambda (offset)
+             (concat " " (number-to-string (abs offset)) " "))))
+#+END_SRC
+
+  Toggle line numbers (num) or relative line numbers (rnum) in a safe
+  manner by turning the other off in case it is on.
+
+#+BEGIN_SRC emacs-lisp
+  (defun num ()
+    (interactive)
+    (if (bound-and-true-p relative-line-numbers-mode)
+        (relative-line-numbers-mode 'toggle))
+    (linum-mode 'toggle))
+
+  (defun rnum ()
+    (interactive)
+    (if (bound-and-true-p linum-mode)
+        (linum-mode 'toggle))
+    (relative-line-numbers-mode 'toggle))
+#+END_SRC
+
+* My Key Bindings
+
+  Main keymaps for personal bindings are:
+
+** C-x <letter> - primary map (has many defaults too)
+
+#+BEGIN_SRC emacs-lisp
+  (bind-key "C-x C-b" #'ibuffer)
+#+END_SRC
+
+** C-c <letter> - secondary map (not just for mode-specific)
+
+*** C-c t <letter> - toggles
+
+#+BEGIN_SRC emacs-lisp
+  (bind-key "C-c t w" #'whitespace-mode)
+  ;(bind-key "C-c T w" #'bml/toggle-show-trailing-whitespace)
+  (bind-key "C-c t f" #'auto-fill-mode)
+#+END_SRC
+
+** C-. <letter> - tertiary map
+** M-g <letter> - goto map
+** M-s <letter> - search map
+** M-o <letter> -  markup map (even if only temporarily)
+** C-<capital letter>
+** M-<capital letter>
+** A-<anything>
+** M-A-<anything>
+** All Other Keybindings
+
+  Single-letter bindings still available:
+
+  + C- ,'";:?<>|!#$%^&*`~ <tab>
+  + M- ?#
+
+#+BEGIN_SRC emacs-lisp
+  (bind-key "M-/" #'hippie-expand)
+  (bind-key "M-o" #'other-window)
+  (bind-key "C-s" #'isearch-forward-regexp)
+  (bind-key "C-r" #'isearch-backward-regexp)
+  (bind-key "C-M-s" #'isearch-forward)
+  (bind-key "C-M-r" #'isearch-backward)
+  (bind-key "RET" #'newline-and-indent)
+#+END_SRC
