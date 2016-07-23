@@ -5,6 +5,11 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+# I want UTF-8 dammit!
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+
 export EDITOR="emacsclient --tty"
 export VISUAL="emacsclient --create-frame --alternate-editor=emacs"
 
@@ -157,6 +162,18 @@ if [ -f ~/.gnupg/gpg-agent-info-$(hostname) ]; then
 elif [ -f ~/.gnupg/gpg-agent-info ]; then
     source ~/.gnupg/gpg-agent-info
 fi
+
+
+# add git bash prompt, if it exists
+if [ -d ~/.bash-git-prompt ]; then
+    export GIT_PROMPT_ONLY_IN_REPO=1
+    source ~/.bash-git-prompt/gitprompt.sh
+fi
+
+
+# alias git to hub to make it automagically work
+eval "$(hub alias -s)"
+
 
 # if we have a local bin directory add it to our path, leave at end
 if [ -d ~/bin ] ; then
