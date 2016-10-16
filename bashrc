@@ -157,11 +157,11 @@ if [ -d ~/adt-bundle-linux/sdk/platform-tools ]; then
 fi
 
 # add GnuPG Agent environtment variables, if they exist
-if [ -f ~/.gnupg/gpg-agent-info-$(hostname) ]; then
-    source ~/.gnupg/gpg-agent-info-$(hostname)
-elif [ -f ~/.gnupg/gpg-agent-info ]; then
-    source ~/.gnupg/gpg-agent-info
-fi
+#if [ -f ~/.gnupg/gpg-agent-info-$(hostname) ]; then
+#    source ~/.gnupg/gpg-agent-info-$(hostname)
+#elif [ -f ~/.gnupg/gpg-agent-info ]; then
+#    source ~/.gnupg/gpg-agent-info
+#fi
 
 
 # add git bash prompt, if it exists
@@ -171,8 +171,22 @@ if [ -d ~/.bash-git-prompt ]; then
 fi
 
 
+# add go support, if it exist
+if [ -d ~/go ]; then
+    export GOPATH=~/go
+    export PATH=$PATH:$GOPATH/bin
+fi
+
+if [ -d /usr/local/go ]; then
+    export GOROOT=/usr/local/go
+    export PATH=$PATH:$GOROOT/bin
+fi
+
+
 # alias git to hub to make it automagically work
-eval "$(hub alias -s)"
+if [ -f ~/bin/hub ]; then
+    eval "$(hub alias -s)"
+fi
 
 
 # if we have a local bin directory add it to our path, leave at end
