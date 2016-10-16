@@ -74,44 +74,6 @@
   :config
   (load-theme 'spacegray t))
 
-;; Set default font and configure font re-sizing
-(setq bml/default-font "Source Code Pro")
-(setq bml/default-font-size 12)
-(setq bml/current-font-size bml/default-font-size)
-(setq bml/font-change-increment 1.1)
-
-(defun bml/set-font-size ()
-  "Set the font to `bml/default-font' at `bml/current-font-size'."
-  (set-frame-font
-   (concat bml/default-font "-" (number-to-string bml/current-font-size))))
-
-(defun bml/reset-font-size ()
-  "Change font size back to `bml/default-font-size'."
-  (interactive)
-  (setq bml/current-font-size bml/default-font-size)
-  (bml/set-font-size))
-
-(defun bml/increase-font-size ()
-  "Increase current font size by a factor of `bml/font-change-increment'."
-  (interactive)
-  (setq bml/current-font-size
-        (ceiling (* bml/current-font-size bml/font-change-increment)))
-  (bml/set-font-size))
-
-(defun bml/decrease-font-size ()
-  "Decrease current font size by a factor of `bml/font-change-increment', down to a minimum size of 1."
-  (interactive)
-  (setq bml/current-font-size
-          (max 1
-               (floor (/ bml/current-font-size bml/font-change-increment))))
-    (bml/set-font-size))
-
-(bind-key "C-)" #'bml/reset-font-size)
-(bind-key "C-+" #'bml/increase-font-size)
-(bind-key "C-=" #'bml/increase-font-size)
-(bind-key "C-_" #'bml/decrease-font-size)
-(bind-key "C--" #'bml/decrease-font-size)
-
 
 ;;; Utility Functions
 (defun bml/reload-settings ()
