@@ -19,5 +19,4 @@ alias ducks='du -cksh'
 
 alias ec='emacsclient --no-wait --create-frame --alternate-editor=emacs'
 alias et='emacsclient --tty --alternate-editor=""'
-alias semacs='sudo emacsclient --tty'
-alias emacsc='emacsclient -c -a emacs'
+alias magit='ec -e "(magit-status \"$(pwd)\")"'

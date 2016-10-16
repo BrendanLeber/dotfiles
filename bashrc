@@ -78,16 +78,9 @@ xterm*|rxvt*)
     ;;
 esac
 
-# enable color support of ls and also add handy aliases
+# enable color support of ls
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    #alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
-    #alias grep='grep --color=auto'
-    #alias fgrep='fgrep --color=auto'
-    #alias egrep='egrep --color=auto'
 fi
 
 # Add an "alert" alias for long running commands.  Use like so:
@@ -103,8 +96,9 @@ fi
 [ -z $TMUX ] && export TERM=xterm-256color
 
 # where the hell am I? (ISO 6709 format)
-export LOCATION=+47.598347-122.334133/
-export LOCATION_NAME="Seattle, WA"
+export LOCATION=+47.305464-122.215806/
+export LOCATION_NAME="Auburn, WA"
+export LOCATION_GRID="CN87vh"
 
 function flac-grep () {
     RX="$1";
@@ -171,7 +165,13 @@ if [ -d ~/.bash-git-prompt ]; then
 fi
 
 
-# add go support, if it exist
+# enable hub if it is installed on the system
+if [ -f /usr/local/bin/hub ]; then
+    eval "$(hub alias -s)"
+fi
+
+
+# add go support, if it exists
 if [ -d ~/go ]; then
     export GOPATH=~/go
     export PATH=$PATH:$GOPATH/bin
