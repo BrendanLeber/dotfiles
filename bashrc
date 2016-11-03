@@ -188,6 +188,15 @@ if [ -f ~/bin/hub ]; then
     eval "$(hub alias -s)"
 fi
 
+# Add hub completion and GPG_TTY env var.
+if [ -f ~/src/github/hub/etc/hub.bash_completion.sh ]; then
+   . ~/src/github/hub/etc/hub.bash_completion.sh
+fi
+
+
+# let GPG Agent know which terminal it should be using
+export GPG_TTY=$(tty)
+
 
 # if we have a local bin directory add it to our path, leave at end
 if [ -d ~/bin ] ; then
