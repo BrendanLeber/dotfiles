@@ -51,9 +51,9 @@
 
 
 ;;; Set Location
-(setq calendar-latitude 47.598347
-      calendar-longitude -122.344133
-      calendar-location-name "Seattle, WA")
+(setq calendar-latitude 47.305464
+      calendar-longitude -122.215806
+      calendar-location-name "Auburn, WA")
 
 
 ;;; Diminish minor-modes we don't need to see
@@ -76,38 +76,26 @@
 
 
 ;;; Utility Functions
-(defun bml/reload-settings ()
-  "Reload configuration settings after changes have been made."
-    (interactive)
-    (load-file "~/.emacs.d/init.el"))
+;; (defun bml/unfill-paragraph ()
+;;   "Takes a multi-line paragraph and makes it into a single line of text."
+;;   (interactive)
+;;   (let ((fill-column (point-max)))
+;;     (fill-paragraph nil)))
 
 
-(defun bml/load-if-exists (file)
-  "Load `file` if it exists."
-  (when (file-exists-p file)
-    (load file)))
-
-
-(defun bml/unfill-paragraph ()
-  "Takes a multi-line paragraph and makes it into a single line of text."
-  (interactive)
-  (let ((fill-column (point-max)))
-    (fill-paragraph nil)))
-
-
-(defun bml/unfill-region (begin end)
-  "Change isolated newlines in region into spaces."
-  (interactive (if (use-region-p)
-                   (list (region-beginning) (region-end))
-                 (list nil nil)))
-  (save-restriction
-    (narrow-to-region (or begin (point-min)) (or end (point-max)))
-    (goto-char (point-min))
-    (while (search-forward "\n" nil t)
-      (if (eq (char-after) ?\n)
-          (skip-chars-forward "\n")
-        (delete-char -1)
-        (insert ?\s)))))
+;; (defun bml/unfill-region (begin end)
+;;   "Change isolated newlines in region into spaces."
+;;   (interactive (if (use-region-p)
+;;                    (list (region-beginning) (region-end))
+;;                  (list nil nil)))
+;;   (save-restriction
+;;     (narrow-to-region (or begin (point-min)) (or end (point-max)))
+;;     (goto-char (point-min))
+;;     (while (search-forward "\n" nil t)
+;;       (if (eq (char-after) ?\n)
+;;           (skip-chars-forward "\n")
+;;         (delete-char -1)
+;;         (insert ?\s)))))
 
 
 (defun bml/kill-current-buffer ()
@@ -123,20 +111,13 @@
     (indent-region (point-min) (point-max))))
 
 
-(defun bml/toggle-show-trailing-whitespace ()
-  "Toggle `show-trailing-whitespace' between t and nil."
-  (interactive)
-  (setq show-trailing-whitespace (not show-trailing-whitespace))
-  (redraw-display))
-
-
 (defun bml/enable-show-trailing-whitespace ()
   (setq show-trailing-whitespace t))
 
 (add-hook 'prog-mode-hook #'bml/enable-show-trailing-whitespace)
 
 
-(defun bml/narrow-to-line (&optional arg)
+(defun narrow-to-line (&optional arg)
   "Narrow to the text of the current line.
 A numeric prefix arg means move forward (backward if negative)
 that many lines, thus narrowing to a line other than the one
@@ -151,13 +132,14 @@ point was originally in."
       (narrow-to-region (line-beginning-position) (line-end-position)))))
 
 
-(defun bml/switch-to-previous-buffer ()
+(defun switch-to-previous-buffer ()
   "Switch to most recent buffer. Repeated calls toggle back and
 forth between the most recent two buffers."
   (interactive)
   (switch-to-buffer (other-buffer (current-buffer) 1)))
 
-(bind-key "C-`" #'bml/switch-to-previous-buffer)
+(bind-key "C-`" #'switch-to-previous-buffer)
+
 
 (defun screenshot-frame ()
   "Take screenshot.
@@ -179,22 +161,22 @@ Enter custom-name or RET to save image with timestamp."
 
 ;;; Packages
 
-(use-package crux
-  :ensure t
-  :config
-  (crux-with-region-or-buffer indent-region)
-  (crux-with-region-or-buffer untabify)
-  (crux-with-region-or-buffer tabify)
-  (crux-with-region-or-line comment-or-uncomment-region)
-  :bind (("C-S-RET" . crux-smart-open-line-above)
-	 ("C-a" . crux-move-beginning-of-line)
-	 ("C-c D" . crux-delete-file-and-buffer)
-	 ("C-c I" . crux-find-user-init-file)
-	 ("C-c S" . crux-find-shell-init-file)
-	 ("C-c d" . crux-duplicate-current-line-or-region)
-	 ("C-c k" . crux-kill-other-buffers)
-	 ("C-c r" . crux-rename-file-and-buffer)
-	 ("S-RET" . crux-smart-open-line)))
+;; (use-package crux
+;;   :ensure t
+;;   :config
+;;   (crux-with-region-or-buffer indent-region)
+;;   (crux-with-region-or-buffer untabify)
+;;   (crux-with-region-or-buffer tabify)
+;;   (crux-with-region-or-line comment-or-uncomment-region)
+;;   :bind (("C-S-RET" . crux-smart-open-line-above)
+;; 	 ("C-a" . crux-move-beginning-of-line)
+;; 	 ("C-c D" . crux-delete-file-and-buffer)
+;; 	 ("C-c I" . crux-find-user-init-file)
+;; 	 ("C-c S" . crux-find-shell-init-file)
+;; 	 ("C-c d" . crux-duplicate-current-line-or-region)
+;; 	 ("C-c k" . crux-kill-other-buffers)
+;; 	 ("C-c r" . crux-rename-file-and-buffer)
+;; 	 ("S-RET" . crux-smart-open-line)))
 
 
 (use-package cc-mode
@@ -206,7 +188,7 @@ Enter custom-name or RET to save image with timestamp."
                           (awk-mode . "awk")
                           (other . "gnu")))
   (defun bml/c-mode-common-hook ()
-    (setq fill-column 78)
+    (setq fill-column 132)
     (setq column-number-mode t)
     (c-set-offset 'arglist-cont-nonempty '*)
     (c-set-offset 'inline-open 0))
@@ -231,6 +213,72 @@ Enter custom-name or RET to save image with timestamp."
   :ensure nil
   :diminish eldoc-mode
   :commands eldoc-mode)
+
+
+(use-package elfeed
+  :ensure t
+  :init
+  (defalias 'elfeed-toggle-star
+    (elfeed-expose #'elfeed-search-toggle-all 'star))
+
+  (defface elfeed-search-starred-title-face
+    '((t :foreground "#f77"))
+    "Marks a starred elfeed entry.")
+
+  (defun elfeed-load-db-and-open ()
+    "Wrapper to load the elfeed db from disk before launching."
+    (interactive)
+    (elfeed-db-load)
+    (elfeed)
+    (elfeed-search-update--force))
+
+  (defun elfeed-save-db-and-bury ()
+    "Wrapper to save the elfeed db to disk before burying buffer."
+    (interactive)
+    (elfeed-db-save)
+    (quit-window))
+
+  (defun elfeed-search-live-filter-space ()
+    "Insert space when running elfeed filter."
+    (interactive)
+    (let ((elfeed-search-filter (concat elfeed-search-filter " ")))
+      (elfeed-search-live-filter)))
+
+  (defun elfeed-show-all ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-all"))
+
+  (defun elfeed-show-daily ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-daily"))
+
+  (defun elfeed-show-emacs ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-emacs"))
+
+  (defun elfeed-show-starred ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-starred"))
+
+  :bind (:map elfeed-search-mode-map
+              ("A" . elfeed-show-all)
+              ("D" . elfeed-show-daily)
+              ("E" . elfeed-show-emacs)
+              ("S" . elfeed-show-starred)
+              ("m" . elfeed-toggle-star)
+              ("q" . elfeed-save-db-and-bury)
+              ("/" . elfeed-search-live-filter-space)))
+
+
+(use-package elfeed-org
+  :ensure t
+  :config
+  (elfeed-org)
+  (setq rmh-elfeed-org-files (list "~/Documents/elfeed.org")))
 
 
 (use-package emacs-lisp-mode
@@ -295,8 +343,8 @@ directory to make multiple shell windows easier."
   (add-hook 'prog-mode-hook 'fci-mode))
 
 
-(use-package flycheck-ledger
-  :ensure t)
+;; (use-package flycheck-ledger
+;;   :ensure t)
 
 
 (use-package flyspell
@@ -306,12 +354,13 @@ directory to make multiple shell windows easier."
 (use-package ggtags
   :ensure t
   :init
-  (defun bml/maybe-turn-on-ggtags-mode ()
+  (defun maybe-turn-on-ggtags-mode ()
     "Possibly turn on `ggtags-mode' if the current mode is derived from one of
 the major programming modes.  `c-mode', `c++-mode', `java-mode', `asm-mode'."
     (interactive)
     (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
       (ggtags-mode 1)))
+  (add-hook 'prog-mode-hook #'maybe-turn-on-ggtags-mode)
   :bind (:map ggtags-mode-map
               ("C-c g s" . ggtags-find-other-symbol)
               ("C-c g h" . ggtags-view-tag-history)
@@ -319,14 +368,12 @@ the major programming modes.  `c-mode', `c++-mode', `java-mode', `asm-mode'."
               ("C-c g f" . ggtags-find-file)
               ("C-c g c" . ggtags-create-tags)
               ("C-c g u" . ggtags-update-tags)
-              ("M-," . pop-tag-mark))
-  :config
-  (add-hook 'prog-mode-hook #'bml/maybe-turn-on-ggtags-mode))
+              ("M-," . pop-tag-mark)))
 
 
-(use-package ledger-mode
-  :ensure t
-  :mode "\\.ledger\\'")
+;; (use-package ledger-mode
+;;   :ensure t
+;;   :mode "\\.ledger\\'")
 
 
 (use-package magit
@@ -337,7 +384,6 @@ the major programming modes.  `c-mode', `c++-mode', `java-mode', `asm-mode'."
     (window-configuration-to-register :magit-fullscreen)
     ad-do-it
     (delete-other-windows))
-  :config
   (setq magit-branch-argumnets nil
         ;; use ido to look for branches
         magit-completing-read-function 'magit-ido-completing-read
@@ -378,7 +424,6 @@ the major programming modes.  `c-mode', `c++-mode', `java-mode', `asm-mode'."
   (setq show-paren-when-point-inside-paren nil
 	show-paren-when-point-in-periphery t))
 
-
 (use-package python
   :ensure t
   :init
@@ -390,26 +435,26 @@ the major programming modes.  `c-mode', `c++-mode', `java-mode', `asm-mode'."
   (add-hook 'python-mode-hook #'isilon/python-mode-hook))
 
 
-(use-package slime
-  :ensure t
-  :config
-  (setq inferior-lisp-program "clisp")
-  (setq slime-contribs '(slime-fancy)))
+;; (use-package slime
+;;   :ensure t
+;;   :config
+;;   (setq inferior-lisp-program "clisp")
+;;   (setq slime-contribs '(slime-fancy)))
 
 
-(use-package smartscan
-  :ensure t
-  :config
-  (add-hook 'prog-mode-hook 'smartscan-mode-turn-on))
+;; (use-package smartscan
+;;   :ensure t
+;;   :config
+;;   (add-hook 'prog-mode-hook 'smartscan-mode-turn-on))
 
 
-(use-package swiper
-  :ensure t
-  :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  :bind (("C-s" . swiper)
-	 ("C-c C-r" . ivy-resume)))
+;; (use-package swiper
+;;   :ensure t
+;;   :config
+;;   (ivy-mode 1)
+;;   (setq ivy-use-virtual-buffers t)
+;;   :bind (("C-s" . swiper)
+;; 	 ("C-c C-r" . ivy-resume)))
 
 
 (use-package uniquify
@@ -469,10 +514,11 @@ the major programming modes.  `c-mode', `c++-mode', `java-mode', `asm-mode'."
 ;; C-c <letter> - secondary map (not just for mode-specific)
 
 ;; C-c t <letter> - toggles
-(bind-key "C-c t w" #'whitespace-mode)
-(bind-key "C-c t t" #'bml/toggle-show-trailing-whitespace)
-(bind-key "C-c t f" #'auto-fill-mode)
-(bind-key "C-c t e" #'toggle-debug-on-error)
+(bind-key "C-c T w" #'whitespace-mode)
+(bind-key "C-c T t" #'bml/toggle-show-trailing-whitespace)
+(bind-key "C-c T f" #'auto-fill-mode)
+(bind-key "C-c T s" #'flyspell-mode)
+(bind-key "C-c T e" #'toggle-debug-on-error)
 
 ;; C-. <letter> - tertiary map
 ;; M-g <letter> - goto map
@@ -504,7 +550,10 @@ the major programming modes.  `c-mode', `c++-mode', `java-mode', `asm-mode'."
  ;; If there is more than one, they won't work right.
  '(auto-save-file-name-transforms (quote ((".*" "~/.emacs.d/auto-save-list/" t))))
  '(backup-directory-alist (quote (("." . "~/.emacs.d/backups"))))
+ '(browse-url-browser-function (quote browse-url-generic))
+ '(browse-url-generic-program "google-chrome")
  '(calendar-week-start-day 1)
+ '(delete-by-moving-to-trash t)
  '(delete-old-versions -1)
  '(gdb-many-windows t)
  '(indent-tabs-mode nil)
@@ -513,15 +562,14 @@ the major programming modes.  `c-mode', `c++-mode', `java-mode', `asm-mode'."
  '(menu-bar-mode nil)
  '(package-selected-packages
    (quote
-    (flycheck-ledger ledger-mode wrap-region which-key volatile-highlights use-package spacegray-theme smartscan magit ggtags fill-column-indicator discover color-theme cmake-mode)))
+    (elfeed elfeed-org json-mode wrap-region which-key volatile-highlights use-package spacegray-theme magit ggtags fill-column-indicator discover color-theme cmake-mode)))
+ '(reb-re-syntax (quote string))
  '(require-final-newline t)
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
  '(tool-bar-mode nil)
  '(user-full-name "Brendan Leber")
- '(user-mail-address "brendan@brendanleber.com")
- '(vc-make-backup-files t)
- '(version-control t))
+ '(user-mail-address "brendan@brendanleber.com"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
