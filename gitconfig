@@ -4,34 +4,35 @@
 	signingkey = E1C33AC64248AB58
 
 [alias]
-    st = status
-    ci = commit
-    co = checkout
-    br = branch
-    unstage = reset HEAD --
-    tags = tag -l
-    branches = branch -a
-    remotes = remote -v
-    stashed = stash list --pretty=format:'%gd: %Cred%h%Creset %Cgreen[%ar]%Creset %s'
-    last = log -1 HEAD
-    lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-    ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
+	st = status
+	ci = commit
+	co = checkout
+	br = branch
+	sub = submodule
+	unstage = reset HEAD --
+	tags = tag -l
+	branches = branch -a
+	remotes = remote -v
+	stashed = stash list --pretty=format:'%gd: %Cred%h%Creset %Cgreen[%ar]%Creset %s'
+	last = log -1 HEAD
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
 	signed = log --pretty=format:\"%h %G? %aN  %s\"
 
 [color]
-    ui = auto
-    interactive = always
-    diff = True
-    branch = True
+	ui = auto
+	interactive = always
+	diff = True
+	branch = True
 
 [credential]
-    helper = cache
+	helper = cache
 
 [push]
-    default = simple
+	default = simple
 
 [pull]
-    rebase = preserve
+	rebase = preserve
 
 [core]
-    excludesfile = ~/.gitignore_global
+	excludesfile = ~/.gitignore_global

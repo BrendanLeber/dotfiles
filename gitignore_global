@@ -1,0 +1,4 @@
+# ignore emacs collective files
+*-autoloads.el
+*.elc
+dir
