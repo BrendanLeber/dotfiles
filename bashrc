@@ -10,9 +10,6 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 
-export EDITOR="emacsclient --tty"
-export VISUAL="emacsclient --create-frame --alternate-editor=emacs"
-
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -170,27 +167,9 @@ if [ -f /usr/local/bin/hub ]; then
     eval "$(hub alias -s)"
 fi
 
-
-# add go support, if it exists
-if [ -d ~/go ]; then
-    export GOPATH=~/go
-    export PATH=$PATH:$GOPATH/bin
-fi
-
-if [ -d /usr/local/go ]; then
-    export GOROOT=/usr/local/go
-    export PATH=$PATH:$GOROOT/bin
-fi
-
-
-# alias git to hub to make it automagically work
-if [ -f ~/bin/hub ]; then
-    eval "$(hub alias -s)"
-fi
-
 # Add hub completion and GPG_TTY env var.
-if [ -f ~/src/github/hub/etc/hub.bash_completion.sh ]; then
-   . ~/src/github/hub/etc/hub.bash_completion.sh
+if [ -f ~/Source/hub/etc/hub.bash_completion.sh ]; then
+   . ~/Source/hub/etc/hub.bash_completion.sh
 fi
 
 
@@ -201,4 +180,7 @@ export GPG_TTY=$(tty)
 # if we have a local bin directory add it to our path, leave at end
 if [ -d ~/bin ] ; then
     export PATH="~/bin:$PATH"
+fi
+if [ -d ~/.local/bin ]; then
+    export PATH="~/.local/bin:$PATH"
 fi
