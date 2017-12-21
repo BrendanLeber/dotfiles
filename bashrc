@@ -184,3 +184,11 @@ fi
 if [ -d ~/.local/bin ]; then
     export PATH="~/.local/bin:$PATH"
 fi
+
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+op() {
+    gnome-open "$@" &> /dev/null
+}
