@@ -1,7 +1,0 @@
-#!/bin/bash
-
-if [[ $(uname) == Darwin ]]; then
-    open "$@"
-else
-    gnome-open "$@" &> /dev/null
-fi
