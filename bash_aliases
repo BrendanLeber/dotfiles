@@ -1,4 +1,4 @@
-alias realias='$EDITOR ~/.bash_aliases; source ~/.bash_aliases'
+alias realias='vim ~/.bash_aliases; source ~/.bash_aliases'
 
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
