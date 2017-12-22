@@ -17,7 +17,8 @@
 # https://damienradtke.com/post/glacier-backup-bash/
 
 # Set this to the name of the Glacier vault to upload to.
-VAULT_NAME=...
+VAULT_NAME=baloo-backup-vault
+
 # 1 MiB in bytes; the tree hash algorithm requires chunks of this
 # size.
 CHUNK_SIZE=1048576

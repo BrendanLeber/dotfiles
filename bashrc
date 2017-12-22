@@ -158,6 +158,8 @@ fi
 # add git bash prompt, if it exists
 if [ -d ~/.bash-git-prompt ]; then
     export GIT_PROMPT_ONLY_IN_REPO=1
+    export GIT_PROMPT_END_USER=" \n$WHITE\u@\h$ResetColor \$ "
+    export GIT_PROMPT_END_ROOT=" \n$WHITE\u@\h$ResetColor # "
     source ~/.bash-git-prompt/gitprompt.sh
 fi
 
