@@ -1,7 +1,7 @@
 [user]
 	name = Brendan Leber
 	email = brendan@brendanleber.com
-	signingkey = E1C33AC64248AB58
+	signingkey = 3D51B090DCF5AC42
 
 [alias]
 	st = status
@@ -36,3 +36,7 @@
 
 [core]
 	excludesfile = ~/.gitignore_global
+[commit]
+	gpgsign = true
+[gpg]
+	program = /usr/bin/gpg2
