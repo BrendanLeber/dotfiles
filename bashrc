@@ -84,11 +84,6 @@ fi
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-# if the algs4 environment exists add it to our path
-if [ -d ~/algs4/bin ] ; then
-    export PATH="~/algs4/bin:$PATH"
-fi
-
 # only set the term capabilities to support 256 color if we're not in tmux
 [ -z $TMUX ] && export TERM=xterm-256color
 
@@ -139,14 +134,6 @@ if [ -f ~/.rakudobrew/bin/rakudobrew ]; then
     export PATH=~/.rakudobrew/bin:$PATH
 fi
 
-# enable the Android SDK tools if they've been installed
-if [ -d ~/adt-bundle-linux/sdk/tools ]; then
-    export PATH=$PATH:~/adt-bundle-linux/sdk/tools
-fi
-if [ -d ~/adt-bundle-linux/sdk/platform-tools ]; then
-    export PATH=$PATH:~/adt-bundle-linux/sdk/platform-tools
-fi
-
 # add GnuPG Agent environtment variables, if they exist
 #if [ -f ~/.gnupg/gpg-agent-info-$(hostname) ]; then
 #    source ~/.gnupg/gpg-agent-info-$(hostname)
@@ -180,9 +167,6 @@ export GPG_TTY=$(tty)
 
 
 # if we have a local bin directory add it to our path, leave at end
-if [ -d ~/bin ] ; then
-    export PATH="~/bin:$PATH"
-fi
 if [ -d ~/.local/bin ]; then
     export PATH="~/.local/bin:$PATH"
 fi
