@@ -178,3 +178,5 @@ mkcd() {
 op() {
     gnome-open "$@" &> /dev/null
 }
+
+export BML_BASHRC=1

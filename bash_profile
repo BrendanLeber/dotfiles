@@ -1,6 +1,19 @@
 if [ -f ~/.bashrc ]; then . ~/.bashrc; fi
 
-export PATH="$HOME/.cargo/bin:$PATH"
+# Cargo, Rust and Racer
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+    export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+fi
+
+
+# pyenv
+if [ -d "$HOME/.pyenv" ]; then
+    export PYENV_ROOT="$HOME/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+fi
+
 
 export SSH_ENV="$HOME/.ssh/environment"
 
@@ -21,3 +34,5 @@ if [ -f "${SSH_ENV}" ]; then
 else
     start_agent;
 fi
+
+export BML_BASH_PROFILE=1
