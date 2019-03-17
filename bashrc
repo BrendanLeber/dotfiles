@@ -92,6 +92,23 @@ export LOCATION=+47.305464-122.215806/
 export LOCATION_NAME="Auburn, WA"
 export LOCATION_GRID="CN87vh"
 
+wttr()
+{
+    # change Paris to your default location
+    local request="wttr.in/${1-47.305464,-122.215806}"
+    [ "$COLUMNS" -lt 125 ] && request+='?n'
+    curl -H "Accept-Language: ${LANG%_*}" --compressed "$request"
+}
+
+moon()
+{
+    # change Paris to your default location
+    local request="wttr.in/${1-Moon}"
+    [ "$COLUMNS" -lt 125 ] && request+='?n'
+    curl -H "Accept-Language: ${LANG%_*}" --compressed "$request"
+}
+
+
 function flac-grep () {
     RX="$1";
     shift;

@@ -17,8 +17,5 @@ alias svs='svn status'
 
 alias ducks='du -cksh'
 
-alias ec='emacsclient --no-wait --create-frame --alternate-editor=emacs'
-alias et='emacsclient --tty --alternate-editor=""'
-alias magit='ec -e "(magit-status \"$(pwd)\")"'
-
-alias gpg='gpg2'
+alias ae='deactivate &> /dev/null; source ./venv/bin/activate'
+alias de='deactivate'
