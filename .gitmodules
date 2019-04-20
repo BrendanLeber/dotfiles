@@ -1,0 +1,12 @@
+[submodule "nvim/site/pack/github/start/vim-airline"]
+	path = nvim/site/pack/github/start/vim-airline
+	url = https://github.com/vim-airline/vim-airline.git
+[submodule "nvim/site/pack/github/start/vim-flake8"]
+	path = nvim/site/pack/github/start/vim-flake8
+	url = https://github.com/nvie/vim-flake8.git
+[submodule "nvim/site/pack/github/start/vim-gotham"]
+	path = nvim/site/pack/github/start/vim-gotham
+	url = https://github.com/whatyouhide/vim-gotham.git
+[submodule "nvim/site/pack/github/start/vim-tmux"]
+	path = nvim/site/pack/github/start/vim-tmux
+	url = https://github.com/tmux-plugins/vim-tmux.git
