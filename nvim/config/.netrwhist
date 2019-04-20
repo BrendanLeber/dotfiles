@@ -1,0 +1,7 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =5
+let g:netrw_dirhist_1='/home/brendan/src/data-structures-algorithms/02-data_structures/01-basic_data_structures/01-check_brackets_in_code/tests'
+let g:netrw_dirhist_2='/home/brendan/src/adventofcode/2015/06-fire_hazard'
+let g:netrw_dirhist_3='/home/brendan/src/data-structures-algorithms/02-data_structures'
+let g:netrw_dirhist_4='/home/brendan/src/data-structures-algorithms/02-data_structures/03-priority_queues_and_disjoint_sets'
+let g:netrw_dirhist_5='/home/brendan/src/data-structures-algorithms/02-data_structures/03-priority_queues_and_disjoint_sets/01-make_heap'
