@@ -1,14 +1,20 @@
+#!/bin/bash
 # ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
+
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
+
 
 # I want UTF-8 dammit!
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
+
+
+# everybody doesn't need to read my diary
+umask 027
+
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -87,11 +93,14 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # only set the term capabilities to support 256 color if we're not in tmux
 [ -z $TMUX ] && export TERM=xterm-256color
 
+
 # where the hell am I? (ISO 6709 format)
 export LOCATION=+47.305464-122.215806/
 export LOCATION_NAME="Auburn, WA"
 export LOCATION_GRID="CN87vh"
 
+
+# display the weather by default in my location
 wttr()
 {
     # change Paris to your default location
@@ -100,6 +109,8 @@ wttr()
     curl -H "Accept-Language: ${LANG%_*}" --compressed "$request"
 }
 
+
+# display the current phase of the moon
 moon()
 {
     # change Paris to your default location
@@ -109,6 +120,7 @@ moon()
 }
 
 
+# search through FLAC files
 function flac-grep () {
     RX="$1";
     shift;
@@ -117,6 +129,8 @@ function flac-grep () {
     done;
 }
 
+
+# find FLAC files matching a regular expression
 function flac-find () {
     RX="$1";
     shift;
@@ -125,14 +139,12 @@ function flac-find () {
     done;
 }
 
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
+# Alias definitions.
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
+
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -141,15 +153,40 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
+
 # enable perlbrew if it has been installed on this system
 if [ -f ~/perl5/perlbrew/etc/bashrc ]; then
     source ~/perl5/perlbrew/etc/bashrc
 fi
 
+
 # enable rakudobrew if it has been installed on this system
 if [ -f ~/.rakudobrew/bin/rakudobrew ]; then
     export PATH=~/.rakudobrew/bin:$PATH
 fi
+
+
+# Cargo, Rust and Racer
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+    export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+fi
+
+
+# pyenv
+if [ -d "$HOME/.pyenv" ]; then
+    export PYENV_ROOT="$HOME/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+fi
+
+
+# add startup for interactive Python REPLs.
+if [ -f "${HOME}/.dotfiles/startup.py" ]; then
+    export PYTHONSTARTUP="${HOME}/.dotfiles/startup.py"
+fi
+
 
 # add GnuPG Agent environtment variables, if they exist
 #if [ -f ~/.gnupg/gpg-agent-info-$(hostname) ]; then
@@ -157,6 +194,27 @@ fi
 #elif [ -f ~/.gnupg/gpg-agent-info ]; then
 #    source ~/.gnupg/gpg-agent-info
 #fi
+
+
+export SSH_ENV="$HOME/.ssh/environment"
+
+function start_ssh_agent {
+    echo "Initializing new SSH agent..."
+    /usr/bin/ssh-agent -s | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    echo succeeded
+    chmod 600 "${SSH_ENV}"
+    source "${SSH_ENV}" > /dev/null
+    /usr/bin/ssh-add;
+}
+
+if [ -f "${SSH_ENV}" ]; then
+    source "${SSH_ENV}" > /dev/null
+    ps -ef | grep ${SSH_AGENT_PID} | grep "ssh-agent -s$" >/dev/null || {
+        start_ssh_agent;
+    }
+else
+    start_ssh_agent;
+fi
 
 
 # add git bash prompt, if it exists
@@ -168,12 +226,10 @@ if [ -d ~/.bash-git-prompt ]; then
 fi
 
 
-# enable hub if it is installed on the system
+# enable hub (and it's completions) if it is installed on the system
 if [ -f /usr/local/bin/hub ]; then
     eval "$(hub alias -s)"
 fi
-
-# Add hub completion and GPG_TTY env var.
 if [ -f ~/Source/hub/etc/hub.bash_completion.sh ]; then
    . ~/Source/hub/etc/hub.bash_completion.sh
 fi
@@ -188,12 +244,22 @@ if [ -d ~/.local/bin ]; then
     export PATH="~/.local/bin:$PATH"
 fi
 
+
+# make a directory and change to it
 mkcd() {
     mkdir -p "$1" && cd "$1"
 }
 
+
+# open a file in gnome using the default application
 op() {
     gnome-open "$@" &> /dev/null
 }
+
+
+# read a .local file if it exists
+if [[ -f ~/.bashrc.local ]]; then
+    source ~/.bashrc.local
+fi
 
 export BML_BASHRC=1

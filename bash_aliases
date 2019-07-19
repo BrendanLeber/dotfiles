@@ -17,5 +17,6 @@ alias svs='svn status'
 
 alias ducks='du -cksh'
 
+alias ce="python -m venv .venv"
 alias ae='deactivate &> /dev/null; source ./venv/bin/activate'
 alias de='deactivate'
