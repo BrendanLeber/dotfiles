@@ -93,6 +93,10 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # only set the term capabilities to support 256 color if we're not in tmux
 [ -z $TMUX ] && export TERM=xterm-256color
 
+if [ -f "${HOME}/.dotfiles/tmux.bash" ]; then
+    source "${HOME}/.dotfiles/tmux.bash"
+fi
+
 
 # where the hell am I? (ISO 6709 format)
 export LOCATION=+47.305464-122.215806/
@@ -178,7 +182,7 @@ if [ -d "$HOME/.pyenv" ]; then
     export PYENV_ROOT="$HOME/.pyenv"
     export PATH="$PYENV_ROOT/bin:$PATH"
     eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
+    #eval "$(pyenv virtualenv-init -)"
 fi
 
 
