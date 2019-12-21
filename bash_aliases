@@ -11,10 +11,6 @@ alias ll='ls -lF'
 alias lla='ls -AlF'
 alias l1='ls -1'
 
-alias svndiff='svn diff --diff-cmd diff -x "-Nu -U10 --show-c-func"'
-alias svndiffbw='svn diff --diff-cmd diff -x "-Nu -Bw --show-c-func"'
-alias svs='svn status'
-
 alias ducks='du -cksh'
 
 alias ce="python -m venv .venv"
