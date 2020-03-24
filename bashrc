@@ -93,7 +93,8 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # only set the term capabilities to support 256 color if we're not in tmux
 [ -z $TMUX ] && export TERM=xterm-256color
 
-if [ -f "${HOME}/.dotfiles/tmux.bash" ]; then
+
+if [[ -f "${HOME}/.dotfiles/tmux.bash" ]]; then
     source "${HOME}/.dotfiles/tmux.bash"
 fi
 
@@ -145,49 +146,42 @@ function flac-find () {
 
 
 # Alias definitions.
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
+if [[ -f "${HOME}/.bash_aliases" ]]; then
+    source "${HOME}/.bash_aliases"
 fi
 
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
 
-# enable perlbrew if it has been installed on this system
-if [ -f ~/perl5/perlbrew/etc/bashrc ]; then
-    source ~/perl5/perlbrew/etc/bashrc
-fi
+# setup some environment variables for (Neo)VIM
+export VIMCONFIG="${HOME}/.config/nvim"
+export VIMDATA="${HOME}/.local/share/nvim"
 
-
-# enable rakudobrew if it has been installed on this system
-if [ -f ~/.rakudobrew/bin/rakudobrew ]; then
-    export PATH=~/.rakudobrew/bin:$PATH
-fi
-
-
-# Cargo, Rust and Racer
-if [ -d "$HOME/.cargo/bin" ]; then
-    export PATH="$HOME/.cargo/bin:$PATH"
-    export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+# if fzf has been installed as a NeoVIM plugin add it to our path
+if [[ -d "${VIMCONFIG}/pack/github/start/fzf/bin" ]]; then
+    export PATH="${VIMCONFIG}/pack/github/start/fzf/bin:${PATH}"
 fi
 
 
 # pyenv
-if [ -d "$HOME/.pyenv" ]; then
-    export PYENV_ROOT="$HOME/.pyenv"
-    export PATH="$PYENV_ROOT/bin:$PATH"
+if [[ -d "${HOME}/.pyenv" ]]; then
+    export PYENV_ROOT="${HOME}/.pyenv"
+    export PATH="${PYENV_ROOT}/bin:${PATH}"
     eval "$(pyenv init -)"
-    #eval "$(pyenv virtualenv-init -)"
+
+    export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+    eval "$(pyenv virtualenv-init -)"
 fi
 
 
 # add startup for interactive Python REPLs.
-if [ -f "${HOME}/.dotfiles/startup.py" ]; then
+if [[ -f "${HOME}/.dotfiles/startup.py" ]]; then
     export PYTHONSTARTUP="${HOME}/.dotfiles/startup.py"
 fi
 
@@ -211,7 +205,7 @@ function start_ssh_agent {
     /usr/bin/ssh-add;
 }
 
-if [ -f "${SSH_ENV}" ]; then
+if [[ -f "${SSH_ENV}" ]]; then
     source "${SSH_ENV}" > /dev/null
     ps -ef | grep ${SSH_AGENT_PID} | grep "ssh-agent -s$" >/dev/null || {
         start_ssh_agent;
@@ -222,20 +216,18 @@ fi
 
 
 # add git bash prompt, if it exists
-if [ -d ~/.bash-git-prompt ]; then
+if [[ -d "${HOME}/.bash-git-prompt" ]]; then
     export GIT_PROMPT_ONLY_IN_REPO=1
     export GIT_PROMPT_END_USER=" \n$WHITE\u@\h$ResetColor \$ "
     export GIT_PROMPT_END_ROOT=" \n$WHITE\u@\h$ResetColor # "
-    source ~/.bash-git-prompt/gitprompt.sh
+    source "${HOME}/.bash-git-prompt/gitprompt.sh"
 fi
 
 
 # enable hub (and it's completions) if it is installed on the system
-if [ -f /usr/local/bin/hub ]; then
+if [[ -f /usr/bin/hub ]]; then
     eval "$(hub alias -s)"
-fi
-if [ -f ~/Source/hub/etc/hub.bash_completion.sh ]; then
-   . ~/Source/hub/etc/hub.bash_completion.sh
+    source ~/.dotfiles/hub.bash_completion.sh
 fi
 
 
@@ -244,7 +236,7 @@ export GPG_TTY=$(tty)
 
 
 # if we have a local bin directory add it to our path, leave at end
-if [ -d ~/.local/bin ]; then
+if [[ -d ~/.local/bin ]]; then
     export PATH="~/.local/bin:$PATH"
 fi
 
