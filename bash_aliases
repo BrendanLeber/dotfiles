@@ -11,6 +11,10 @@ alias ll='ls -lF'
 alias lla='ls -AlF'
 alias l1='ls -1'
 
+alias damnit='nvim $(git grep -l "<<<< HEAD")'
+
+alias flac2alac='for i in *.flac; do echo $i; ffmpeg -i "$i" -y -v 0 -vcodec copy -acodec alac "${i%.flac}".m4a; done'
+
 alias ducks='du -cksh'
 
 alias ce="python -m venv .venv"
