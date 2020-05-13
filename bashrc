@@ -235,12 +235,6 @@ fi
 export GPG_TTY=$(tty)
 
 
-# if we have a local bin directory add it to our path, leave at end
-if [[ -d ~/.local/bin ]]; then
-    export PATH="~/.local/bin:$PATH"
-fi
-
-
 # make a directory and change to it
 mkcd() {
     mkdir -p "$1" && cd "$1"
@@ -251,6 +245,19 @@ mkcd() {
 op() {
     gnome-open "$@" &> /dev/null
 }
+
+
+PATH="/home/brendan/perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="/home/brendan/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="/home/brendan/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"/home/brendan/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/home/brendan/perl5"; export PERL_MM_OPT;
+
+
+# if we have a local bin directory add it to our path, leave at end
+if [[ -d ~/.local/bin ]]; then
+    export PATH="~/.local/bin:$PATH"
+fi
 
 
 # read a .local file if it exists
